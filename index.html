@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Styler Studio</title>
+<style>
+  :root {
+    --paper: #f3efe6;
+    --panel: #ffffff;
+    --ink: #1c2b2a;
+    --teal: #0f766e;
+    --teal-dark: #134e4a;
+    --line: #cfd8d3;
+    --danger: #b42318;
+    --stage: #ffffff;
+  }
+  body.night {
+    --paper: #0f1a1a;
+    --panel: #172524;
+    --ink: #e6f1ee;
+    --teal: #2dd4bf;
+    --teal-dark: #5eead4;
+    --line: #2f4543;
+    --stage: #1e302e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 14px 40px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Trebuchet MS", Verdana, sans-serif;
+    transition: background .3s, color .3s;
+  }
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+  }
+  header { grid-column: 1 / -1; }
+  header h1 {
+    margin: 0;
+    font-family: Georgia, serif;
+    font-size: 2rem;
+    color: var(--teal-dark);
+  }
+  header p { margin: 4px 0 0; opacity: .8; }
+
+  .stage {
+    background: var(--stage);
+    border: 2px solid var(--line);
+    border-radius: 6px;
+    padding: 28px;
+    min-height: 320px;
+    transition: background .3s;
+  }
+  #sample {
+    margin: 0;
+    line-height: 1.7;
+    font-size: 18px;
+    overflow-wrap: anywhere;
+  }
+  .status {
+    margin-top: 12px;
+    font-size: 13px;
+    opacity: .75;
+  }
+
+  aside {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px;
+    align-self: start;
+  }
+  fieldset {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 0;
+    padding: 12px 0;
+  }
+  fieldset:first-of-type { border-top: none; padding-top: 0; }
+  legend {
+    font-weight: bold;
+    padding: 0 6px 0 0;
+    color: var(--teal-dark);
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  button {
+    padding: 8px 11px;
+    border: 1px solid var(--teal);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--teal-dark);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--teal); color: #fff; }
+  button:focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+  button.active { background: var(--teal); color: #fff; }
+  button.danger { border-color: var(--danger); color: var(--danger); }
+  button.danger:hover { background: var(--danger); color: #fff; }
+
+  .swatch {
+    width: 30px; height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+  }
+  .swatch:hover { transform: scale(1.12); background: inherit; }
+
+  input[type="range"] { width: 100%; accent-color: var(--teal); }
+  .size-label { font-size: 13px; }
+
+  @media (max-width: 760px) {
+    .wrap { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Text Styler Studio</h1>
+    <p>Pick any option from the side panel and watch the sample text change.</p>
+  </header>
+
+  <main>
+    <div class="stage" id="stage">
+      <p id="sample">Hello and welcome to Text Styler Studio. Change my colour, size, typeface, alignment and more using the controls on the right.</p>
+    </div>
+    <div class="status" id="status">Current style: default</div>
+  </main>
+
+  <aside>
+    <fieldset>
+      <legend>Colour</legend>
+      <div class="row">
+        <button class="swatch" style="background:#dc2626" title="Red" aria-label="Red" data-color="#dc2626"></button>
+        <button class="swatch" style="background:#2563eb" title="Blue" aria-label="Blue" data-color="#2563eb"></button>
+        <button class="swatch" style="background:#16a34a" title="Green" aria-label="Green" data-color="#16a34a"></button>
+        <button class="swatch" style="background:#9333ea" title="Purple" aria-label="Purple" data-color="#9333ea"></button>
+        <button class="swatch" style="background:#ea580c" title="Orange" aria-label="Orange" data-color="#ea580c"></button>
+        <button class="swatch" style="background:#000000" title="Black" aria-label="Black" data-color="#000000"></button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Size</legend>
+      <input type="range" id="sizeSlider" min="10" max="64" value="18" aria-label="Font size">
+      <div class="size-label">Size: <span id="sizeValue">18</span>px</div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Typeface</legend>
+      <div class="row">
+        <button data-font="Arial, sans-serif">Arial</button>
+        <button data-font="Georgia, serif">Georgia</button>
+        <button data-font="'Courier New', monospace">Courier</button>
+        <button data-font="'Comic Sans MS', cursive">Comic</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Emphasis</legend>
+      <div class="row">
+        <button id="boldBtn">Bold</button>
+        <button id="italicBtn">Italic</button>
+        <button data-deco="underline">Underline</button>
+        <button data-deco="overline">Overline</button>
+        <button data-deco="line-through">Strike</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Alignment</legend>
+      <div class="row">
+        <button data-align="left">Left</button>
+        <button data-align="center">Centre</button>
+        <button data-align="right">Right</button>
+        <button data-align="justify">Justify</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Letter case</legend>
+      <div class="row">
+        <button data-case="uppercase">Upper</button>
+        <button data-case="lowercase">Lower</button>
+        <button data-case="capitalize">Title</button>
+        <button data-case="none">Normal</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Spacing</legend>
+      <div class="row">
+        <button id="spaceUp">Wider</button>
+        <button id="spaceDown">Tighter</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Box background</legend>
+      <div class="row">
+        <button class="swatch" style="background:#fef3c7" aria-label="Cream" data-bg="#fef3c7"></button>
+        <button class="swatch" style="background:#dbeafe" aria-label="Sky" data-bg="#dbeafe"></button>
+        <button class="swatch" style="background:#dcfce7" aria-label="Mint" data-bg="#dcfce7"></button>
+        <button class="swatch" style="background:#fce7f3" aria-label="Rose" data-bg="#fce7f3"></button>
+        <button class="swatch" style="background:#ffffff" aria-label="White" data-bg="#ffffff"></button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Page</legend>
+      <div class="row">
+        <button id="themeBtn">Day / Night</button>
+        <button class="danger" id="resetBtn">Reset all</button>
+      </div>
+    </fieldset>
+  </aside>
+
+</div>
+
+<script>
+  const sample = document.getElementById("sample");
+  const stage = document.getElementById("stage");
+  const statusBar = document.getElementById("status");
+  const slider = document.getElementById("sizeSlider");
+  const sizeValue = document.getElementById("sizeValue");
+
+  let letterGap = 0;
+  const decorations = new Set();
+
+  function report(message) {
+    statusBar.textContent = "Last change: " + message;
+  }
+
+  // Colour swatches
+  document.querySelectorAll("[data-color]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      sample.style.color = btn.dataset.color;
+      report("text colour " + btn.getAttribute("aria-label"));
+    });
+  });
+
+  // Size slider
+  slider.addEventListener("input", function () {
+    sample.style.fontSize = slider.value + "px";
+    sizeValue.textContent = slider.value;
+    report("font size " + slider.value + "px");
+  });
+
+  // Typeface
+  document.querySelectorAll("[data-font]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      sample.style.fontFamily = btn.dataset.font;
+      report("typeface " + btn.textContent);
+    });
+  });
+
+  // Bold and italic
+  const boldBtn = document.getElementById("boldBtn");
+  const italicBtn = document.getElementById("italicBtn");
+  let isBold = false;
+  let isItalic = false;
+
+  boldBtn.addEventListener("click", function () {
+    isBold = !isBold;
+    sample.style.fontWeight = isBold ? "700" : "400";
+    boldBtn.classList.toggle("active", isBold);
+    report(isBold ? "bold on" : "bold off");
+  });
+
+  italicBtn.addEventListener("click", function () {
+    isItalic = !isItalic;
+    sample.style.fontStyle = isItalic ? "italic" : "normal";
+    italicBtn.classList.toggle("active", isItalic);
+    report(isItalic ? "italic on" : "italic off");
+  });
+
+  // Decorations (can be combined, click again to remove)
+  document.querySelectorAll("[data-deco]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const kind = btn.dataset.deco;
+      if (decorations.has(kind)) {
+        decorations.delete(kind);
+      } else {
+        decorations.add(kind);
+      }
+      btn.classList.toggle("active", decorations.has(kind));
+      sample.style.textDecoration = decorations.size
+        ? Array.from(decorations).join(" ")
+        : "none";
+      report("decoration: " + (decorations.size ? Array.from(decorations).join(", ") : "none"));
+    });
+  });
+
+  // Alignment
+  document.querySelectorAll("[data-align]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      sample.style.textAlign = btn.dataset.align;
+      report("alignment " + btn.textContent);
+    });
+  });
+
+  // Letter case
+  document.querySelectorAll("[data-case]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      sample.style.textTransform = btn.dataset.case;
+      report("letter case " + btn.textContent);
+    });
+  });
+
+  // Letter spacing
+  function setGap(delta) {
+    letterGap = Math.max(-2, Math.min(10, letterGap + delta));
+    sample.style.letterSpacing = letterGap + "px";
+    report("letter spacing " + letterGap + "px");
+  }
+  document.getElementById("spaceUp").addEventListener("click", function () { setGap(1); });
+  document.getElementById("spaceDown").addEventListener("click", function () { setGap(-1); });
+
+  // Box background
+  document.querySelectorAll("[data-bg]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      stage.style.backgroundColor = btn.dataset.bg;
+      // keep text readable on light box colours while in night mode
+      if (document.body.classList.contains("night") && !sample.style.color) {
+        sample.style.color = "#111";
+      }
+      report("box background " + btn.getAttribute("aria-label"));
+    });
+  });
+
+  // Day / night
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    document.body.classList.toggle("night");
+    report(document.body.classList.contains("night") ? "night mode" : "day mode");
+  });
+
+  // Reset everything
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    sample.removeAttribute("style");
+    stage.removeAttribute("style");
+    document.body.classList.remove("night");
+    decorations.clear();
+    letterGap = 0;
+    isBold = false;
+    isItalic = false;
+    slider.value = 18;
+    sizeValue.textContent = "18";
+    document.querySelectorAll("button.active").forEach(function (b) {
+      b.classList.remove("active");
+    });
+    statusBar.textContent = "Current style: default";
+  });
+</script>
+</body>
+</html>
